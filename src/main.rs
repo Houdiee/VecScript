@@ -1,39 +1,6 @@
 mod global;
+mod lexer;
 mod vec;
-
-pub enum TokenType {
-    Number(f64),
-    Identifier(String),
-    Keyword(KeywordType),
-    Operator(OperatorType),
-    Delimiter(DelimiterType),
-}
-
-pub enum DelimiterType {
-    LParen,   // (
-    RParen,   // )
-    LBracket, // [
-    RBracket, // ]
-    LChevron, // <
-    RChevron, // >
-    Comma,    // ,
-    Colon,    // :
-    Pipe,     // |
-}
-
-pub enum KeywordType {
-    Solve,
-    Let,
-    In,
-}
-
-pub enum OperatorType {
-    Plus,
-    Minus,
-    Multiply,
-    Divide,
-    Dot,
-}
 
 pub enum Expression {
     // basic types
@@ -46,6 +13,9 @@ pub enum Expression {
     Sin(Box<Expression>),
     Cos(Box<Expression>),
     Tan(Box<Expression>),
+    Asin(Box<Expression>),
+    Acos(Box<Expression>),
+    Atan(Box<Expression>),
 
     // global functions
     Add(Box<Expression>, Box<Expression>),
@@ -60,6 +30,15 @@ pub enum Expression {
     MethodCall {
         object: Box<Expression>,
         method: String,
+    },
+}
+
+pub enum Statement {
+    ExpressionStatement(Expression),
+    LetIn {
+        variable: String,
+        value: Box<Expression>,
+        body: Box<Statement>,
     },
 }
 
