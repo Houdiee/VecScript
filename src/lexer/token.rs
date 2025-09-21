@@ -29,26 +29,6 @@ pub enum KeywordType {
     Solve,
     Let,
     In,
-
-    // FUNCTIONS
-    Sin,
-    Cos,
-    Tan,
-    Asin,
-    Acos,
-    Atan,
-    Add,
-    Subtract,
-    Multiply,
-    Divide,
-    Power,
-    Mag,
-    Dot,
-    Cross,
-
-    // METHODS
-    Rows,
-    Cols,
 }
 
 pub enum OperatorType {

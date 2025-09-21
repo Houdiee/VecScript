@@ -59,12 +59,16 @@ impl<'a> Lexer<'a> {
 
             operator @ ('=' | '+' | '-' | '*' | '/' | '^' | '.') => {
                 self.advance();
-                Self::tokenize_operator(operator, start_line, start_column).map(Some)
+                Ok(Self::tokenize_operator(operator, start_line, start_column))
             }
 
             delimiter @ ('(' | ')' | '[' | ']' | '<' | '>' | ',' | ':' | '|') => {
                 self.advance();
-                Self::tokenize_delimiter(delimiter, start_line, start_column).map(Some)
+                Ok(Self::tokenize_delimiter(
+                    delimiter,
+                    start_line,
+                    start_column,
+                ))
             }
 
             _ => {
@@ -122,6 +126,14 @@ impl<'a> Lexer<'a> {
             }
         }
 
+        if literal.is_empty() || (literal.len() == 1 && literal.starts_with('.')) {
+            return Err(LexerError::InvalidNumber {
+                line,
+                column,
+                literal,
+            });
+        }
+
         let value: f64 = match literal.parse() {
             Ok(val) => val,
             Err(_) => {
@@ -141,7 +153,7 @@ impl<'a> Lexer<'a> {
         })
     }
 
-    fn tokenize_delimiter(delimiter: char, line: u32, column: u32) -> Result<Token, LexerError> {
+    fn tokenize_delimiter(delimiter: char, line: u32, column: u32) -> Option<Token> {
         let literal = delimiter.to_string();
         let token_type = match delimiter {
             '(' => TokenType::Delimiter(DelimiterType::LParen),
@@ -153,16 +165,10 @@ impl<'a> Lexer<'a> {
             ',' => TokenType::Delimiter(DelimiterType::Comma),
             ':' => TokenType::Delimiter(DelimiterType::Colon),
             '|' => TokenType::Delimiter(DelimiterType::Pipe),
-            _ => {
-                return Err(LexerError::InvalidDelimiter {
-                    line,
-                    column,
-                    delimiter,
-                });
-            }
+            _ => return None,
         };
 
-        Ok(Token {
+        Some(Token {
             token_type,
             literal,
             line,
@@ -170,7 +176,7 @@ impl<'a> Lexer<'a> {
         })
     }
 
-    fn tokenize_operator(operator: char, line: u32, column: u32) -> Result<Token, LexerError> {
+    fn tokenize_operator(operator: char, line: u32, column: u32) -> Option<Token> {
         let literal = operator.to_string();
         let token_type = match operator {
             '=' => TokenType::Operator(OperatorType::Equals),
@@ -180,16 +186,10 @@ impl<'a> Lexer<'a> {
             '/' => TokenType::Operator(OperatorType::Divide),
             '^' => TokenType::Operator(OperatorType::Power),
             '.' => TokenType::Operator(OperatorType::Dot),
-            _ => {
-                return Err(LexerError::InvalidOperator {
-                    line,
-                    column,
-                    operator,
-                });
-            }
+            _ => return None,
         };
 
-        Ok(Token {
+        Some(Token {
             token_type,
             literal,
             line,
