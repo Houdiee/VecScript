@@ -41,7 +41,7 @@ impl<'a> Lexer<'a> {
         Some(current_char)
     }
 
-    fn next_token(&mut self) -> Result<Option<Token>, LexerError> {
+    pub fn next_token(&mut self) -> Result<Option<Token>, LexerError> {
         self.skip_non_tokens();
         let start_line = self.line;
         let start_column = self.column;
@@ -51,9 +51,7 @@ impl<'a> Lexer<'a> {
         };
 
         match current {
-            c if c.is_alphanumeric() || c == '_' => {
-                Ok(self.tokenize_identifier_or_keyword(start_line, start_column))
-            }
+            c if c.is_alphanumeric() || c == '_' => Ok(Some(self.tokenize_identifier_or_keyword(start_line, start_column))),
 
             c if c.is_digit(10) => self.tokenize_number(start_line, start_column).map(Some),
 
@@ -78,7 +76,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    fn tokenize_identifier_or_keyword(&mut self, line: u32, column: u32) -> Option<Token> {
+    fn tokenize_identifier_or_keyword(&mut self, line: u32, column: u32) -> Token {
         let mut identifier = String::new();
 
         while let Some(&c) = self.peek() {
@@ -97,12 +95,12 @@ impl<'a> Lexer<'a> {
             _ => TokenType::Identifier(identifier.clone()),
         };
 
-        Some(Token {
+        Token {
             token_type,
             literal: identifier,
             line,
             column,
-        })
+        }
     }
 
     fn tokenize_number(&mut self, line: u32, column: u32) -> Result<Token, LexerError> {
@@ -125,11 +123,7 @@ impl<'a> Lexer<'a> {
         let value: f64 = match literal.parse() {
             Ok(val) => val,
             Err(_) => {
-                return Err(LexerError::InvalidNumber {
-                    line,
-                    column,
-                    literal,
-                });
+                return Err(LexerError::InvalidNumber { line, column, literal });
             }
         };
 
@@ -154,11 +148,7 @@ impl<'a> Lexer<'a> {
             ':' => TokenType::Delimiter(DelimiterType::Colon),
             '|' => TokenType::Delimiter(DelimiterType::Pipe),
             _ => {
-                return Err(LexerError::InvalidDelimiter {
-                    line,
-                    column,
-                    delimiter,
-                });
+                return Err(LexerError::InvalidDelimiter { line, column, delimiter });
             }
         };
 
@@ -181,11 +171,7 @@ impl<'a> Lexer<'a> {
             '^' => TokenType::Operator(OperatorType::Power),
             '.' => TokenType::Operator(OperatorType::Dot),
             _ => {
-                return Err(LexerError::InvalidOperator {
-                    line,
-                    column,
-                    operator,
-                });
+                return Err(LexerError::InvalidOperator { line, column, operator });
             }
         };
 
