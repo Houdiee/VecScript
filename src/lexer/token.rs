@@ -1,4 +1,4 @@
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub struct Token {
     pub token_type: TokenType,
     pub literal: String,
@@ -6,7 +6,7 @@ pub struct Token {
     pub column: u32,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Clone)]
 pub enum TokenType {
     Number(f64),
     Identifier(String),
@@ -15,7 +15,7 @@ pub enum TokenType {
     Delimiter(DelimiterType),
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum DelimiterType {
     LParen,   // (
     RParen,   // )
@@ -28,14 +28,14 @@ pub enum DelimiterType {
     Pipe,     // |
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum KeywordType {
     Solve,
     Let,
     In,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq, Eq, Clone)]
 pub enum OperatorType {
     Equals,   // =
     Plus,     // +

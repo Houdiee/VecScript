@@ -38,11 +38,21 @@ pub enum Statement {
     Expression(Expression),
     LetIn {
         variable: String,
+        variable_type: Option<Type>,
         value: Box<Expression>,
         body: Box<Statement>,
     },
-    SolveIn {
+    SolveForIn {
         variable: String,
         equation: Box<Expression>,
     },
+}
+
+#[derive(Debug)]
+pub enum Type {
+    Number,
+    Bool,
+    Vector(Box<Type>),
+    Matrix(Box<Type>),
+    Symbolic,
 }
